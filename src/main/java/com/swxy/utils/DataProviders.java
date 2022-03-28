@@ -1,6 +1,7 @@
 package com.swxy.utils;
 
 
+import com.swxy.exception.CustomException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,7 +28,7 @@ public class DataProviders implements Iterator<Object> {
 
     public DataProviders(){}
 
-    public DataProviders(String sheetName) throws Exception {
+    public DataProviders(String sheetName){
 
         File file = new File(TEST_DATE_PATH);
         if (file.exists() && file.isFile()){
@@ -45,9 +46,15 @@ public class DataProviders implements Iterator<Object> {
             } catch (Exception e) {
                 e.printStackTrace();
 
+            }finally {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }else {
-            throw new Exception("文件不存在");
+            throw new CustomException("文件不存在");
         }
     }
 
@@ -91,6 +98,10 @@ public class DataProviders implements Iterator<Object> {
         }
     }
 
+    /**
+     * 读取excel数据，已map形式存放
+     * @return
+     */
     @Override
     public Map<String,String> next() {
         Map<String,String> map = new HashMap<>();
@@ -128,16 +139,5 @@ public class DataProviders implements Iterator<Object> {
         return paramsMap;
     }
 
-    public static void main(String[] args) throws Exception {
-//        DataProviders orderTest = new DataProviders("OrderTest");
-//        while (orderTest.hasNext()){
-//            System.out.println(orderTest.next().toString());
-//        }
-        String s = "\"inputJson=[\n" +
-                "  {\n" +
-                "    \"\"waybillId\"\": \"\"1ZT18032100000001\"\"\n" +
-                "  }\n" +
-                "]\"";
-        System.out.println(DataProviders.inputJsonToMap(s));;
-    }
+
 }
